@@ -19,14 +19,6 @@
       <v-list-item prepend-icon="mdi-star" title="Starred" value="starred"></v-list-item>
     </v-list>
   </v-navigation-drawer>
-        <div>
-          <v-btn
-            color="primary"
-            @click.stop="drawer = !drawer"
-          >
-            Toggle
-          </v-btn>
-        </div>
 </template>
 
 <script>
