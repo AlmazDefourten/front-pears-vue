@@ -6,8 +6,9 @@
     :modules="modules"
     :virtual="true"
     :spaceBetween="5"
-    :allow-slide-prev="false"
     :slidesPerView="1"
+    :observer="true"
+    :watchSlidesProgress="true"
     :maxBackfaceHiddenSlides="1"
     @slideChange="slideChange"
   >
@@ -45,6 +46,7 @@ export default {
   },
   setup() {
     let swiperRef: SwiperClass;
+    const currentCardId = ref(0);
     const swiperVisible = ref(true);
 
     const slides = ref(
@@ -57,12 +59,14 @@ export default {
     };
 
     const slideChange = (swiper: SwiperClass) => {
+      currentCardId.value = swiper.activeIndex;
       if (swiper.previousIndex < swiper.activeIndex) {
 
       } else {
       }
       slides.value.splice(swiper.previousIndex, 1);
-      console.log(slides.value.length);
+      swiper.activeIndex = swiper.previousIndex;
+      console.log(swiper);
       if (slides.value.length == 0) {
         swiperVisible.value = false;
       }
@@ -75,6 +79,7 @@ export default {
     return {
       modules: [EffectCards, Virtual],
       setSwiperRef,
+      currentCardId,
       slideChange,
       slideTo,
       swiperVisible,
