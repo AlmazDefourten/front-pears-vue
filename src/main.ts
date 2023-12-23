@@ -12,8 +12,11 @@ import { createApp } from 'vue'
 
 // Plugins
 import { registerPlugins } from '@/plugins'
+import Vue3TouchEvents from "vue3-touch-events";
 
 const app = createApp(App)
+
+app.use(Vue3TouchEvents);
 
 registerPlugins(app)
 

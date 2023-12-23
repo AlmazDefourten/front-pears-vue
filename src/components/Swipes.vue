@@ -1,94 +1,89 @@
 <template>
-  <swiper
-    v-if="swiperVisible"
-    class="ml-16"
-    :effect="'cards'"
-    :modules="modules"
-    :virtual="true"
-    :spaceBetween="5"
-    :slidesPerView="1"
-    :observer="true"
-    :watchSlidesProgress="true"
-    :maxBackfaceHiddenSlides="1"
-    @slideChange="slideChange"
+  <div id="swiper" style="width:100%; height: 100%;">
+  </div>
+  <div
+    class="mt-5"
+    style="display: flex; justify-content: center"
   >
-    <swiper-slide
-      v-for="(slideContent, index) in slides"
-      :key="index"
-      :virtualIndex="index"
-    ><div style="height:500px; justify-self: start;">
-      <img style="width: 300px; height: 350px;" src="../assets/pear_logo.svg"/>
-      <p v-text="slideContent"></p>
-      <p style="font-weight: lighter">Some boring description idk Some boring description idkSome boring description idkSome boring description idk</p>
-    </div></swiper-slide>
-  </swiper>
+    <v-btn
+      id="dislike"
+      :onclick="onDislike"
+      class="yes-no-button"
+      icon="mdi-close-thick"
+      size="x-large">
+    </v-btn>
+    <v-btn
+      id="like"
+      :onClick="onLike"
+      class="ml-15 yes-no-button"
+      icon="mdi-check-bold"
+      size="x-large">
+    </v-btn>
+  </div>
 </template>
-<script lang="ts">
-// Import Swiper Vue.js components
-import { Swiper, SwiperSlide } from 'swiper/vue';
-import { SwiperClass } from "swiper/swiper-react";
+<script lang="js" setup>
 
-// Import Swiper styles
-import 'swiper/css';
+import Card from "./card";
+import {onMounted, ref} from "vue";
 
-import 'swiper/css/effect-cards';
+import styles from '../styles/swipes.css';
+import {TestData} from "@/assets/data/TestData";
 
-import '../styles/swipes.css';
+let CardsArr = [];
+let cardCount = 0;
 
-// import required modules
-import {EffectCards, Virtual} from 'swiper/modules';
-import {ref} from "vue";
+onMounted(() => {
+  const swiper = document.querySelector('#swiper');
+  const like = document.querySelector('#like');
+  const dislike = document.querySelector('#dislike');
 
-export default {
-  components: {
-    Swiper,
-    SwiperSlide,
-  },
-  setup() {
-    let swiperRef: SwiperClass;
-    const currentCardId = ref(0);
-    const swiperVisible = ref(true);
-
-    const slides = ref(
-      Array.from({ length: 5 }).map((_, index) => `Tom martin ${index}`)
-    );
-    slides.value.push('end');
-
-    const setSwiperRef = (swiper: SwiperClass) => {
-      swiperRef = swiper;
-    };
-
-    const slideChange = (swiper: SwiperClass) => {
-      currentCardId.value = swiper.activeIndex;
-      if (swiper.previousIndex < swiper.activeIndex) {
-
-      } else {
+  function appendNewCard() {
+    const card = new Card({
+      imageUrl: TestData.urls[cardCount % 5],
+      onDismiss: appendNewCard,
+      nickname: TestData.nicknames[cardCount % 5],
+      description: TestData.descriptions[cardCount % 5],
+      onLike: () => {
+        TestData.choiceHistory.push(CardsArr[cardCount - 1]);
+        console.log(TestData.choiceHistory);
+        like.style.animationPlayState = 'running';
+        like.classList.toggle('trigger');
+      },
+      onDislike: () => {
+        console.log(TestData.choiceHistory);
+        dislike.style.animationPlayState = 'running';
+        dislike.classList.toggle('trigger');
       }
-      slides.value.splice(swiper.previousIndex, 1);
-      swiper.activeIndex = swiper.previousIndex;
-      console.log(swiper);
-      if (slides.value.length == 0) {
-        swiperVisible.value = false;
-      }
+    });
+    swiper.append(card.element);
+    CardsArr[cardCount] = card;
+    cardCount++;
+    if (cardCount >= 5) {
+      cardCount = 0;
     }
 
-    const slideTo = (index: number) => {
-      swiperRef.slideTo(index - 1, 0);
-    };
+    const cards = swiper.querySelectorAll('.card:not(.dismissing)');
+    cards.forEach((cardel, index) => {
+      cardel.style.setProperty('--i', index);
+    });
+  }
 
-    return {
-      modules: [EffectCards, Virtual],
-      setSwiperRef,
-      currentCardId,
-      slideChange,
-      slideTo,
-      swiperVisible,
-      slides,
-    };
-  },
-};
+  for (let i = 0; i < 5; i++) {
+    appendNewCard();
+  }
+});
+
+const onDislike = () => {
+  CardsArr[cardCount].swipe(-1);
+}
+
+const onLike = () => {
+  CardsArr[cardCount].swipe(1);
+}
+
 </script>
 <style scoped>
-.mySwiper {
-}
+
+@import "../styles/swipes.css";
+
 </style>

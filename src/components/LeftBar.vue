@@ -5,26 +5,34 @@
   >
     <v-list>
       <v-list-item
-        prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg"
-        title="Sandra Adams"
-        subtitle="sandra_a88@gmailcom"
+        :prepend-avatar=TestData().testUser.avatarUrl
+        :title=TestData().testUser.name
+        size="x-large"
       ></v-list-item>
     </v-list>
 
     <v-divider></v-divider>
 
     <v-list density="compact" nav>
-      <v-list-item prepend-icon="mdi-folder" title="My Files" value="myfiles"></v-list-item>
-      <v-list-item prepend-icon="mdi-account-multiple" title="Shared with me" value="shared"></v-list-item>
-      <v-list-item prepend-icon="mdi-star" title="Starred" value="starred"></v-list-item>
+      <v-list-item href="/profile" prepend-icon="mdi-account" title="Профиль" value="myfiles"></v-list-item>
+      <v-list-item href="/" prepend-icon="mdi-cards" title="Свайпы" value="shared"></v-list-item>
+      <v-list-item href="/matches" prepend-icon="mdi-account-multiple" title="Совпадения" value="shared"></v-list-item>
+      <v-list-item href="/chat" prepend-icon="mdi-message-outline" title="Чаты" value="starred"></v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
 
 <script>
 
+import {TestData} from "@/assets/data/TestData";
+
 export default {
-  data () {
+  methods: {
+    TestData() {
+      return TestData
+    }
+  },
+  data() {
     return {
       drawer: null,
     }
