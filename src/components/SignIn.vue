@@ -16,18 +16,22 @@
     </v-sheet>
   </div>
 </template>
-<script>
-export default {
-  data() {
-    return {
-      username: '',
-      password: '',
-    };
-  },
-  methods: {
-    login() {
-      // Your login logic here
-    },
-  },
+<script setup>
+
+import axios from "axios";
+import {ref} from "vue";
+import {DefaultApi} from "@/env";
+
+const username = ref("");
+const password = ref("");
+
+const login = () => {
+  axios.post(DefaultApi + "Users/login", {email: username.value, password: password.value})
+    .then(response => {
+      console.log(response.data);
+      localStorage.setItem("accessToken", response.data.accessToken);
+    }, error => {
+      console.log(error);
+    });
 }
 </script>

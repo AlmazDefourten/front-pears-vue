@@ -28,39 +28,35 @@ import {onMounted, ref} from "vue";
 
 import styles from '../styles/swipes.css';
 import {TestData} from "@/assets/data/TestData";
+import axios from "axios";
+import {DefaultApi} from "@/env";
 
 let CardsArr = [];
 let cardCount = 0;
 
-onMounted(() => {
+onMounted(async () => {
   const swiper = document.querySelector('#swiper');
   const like = document.querySelector('#like');
   const dislike = document.querySelector('#dislike');
 
+  const cardsData = ref();
+
   function appendNewCard() {
     const card = new Card({
-      imageUrl: TestData.urls[cardCount % 5],
-      onDismiss: appendNewCard,
-      nickname: TestData.nicknames[cardCount % 5],
-      description: TestData.descriptions[cardCount % 5],
+      imageUrl: TestData.urls[cardCount],
+      nickname: cardsData.value[cardCount].id,
+      description: cardsData.value[cardCount].description,
       onLike: () => {
-        TestData.choiceHistory.push(CardsArr[cardCount - 1]);
-        console.log(TestData.choiceHistory);
         like.style.animationPlayState = 'running';
         like.classList.toggle('trigger');
       },
       onDislike: () => {
-        console.log(TestData.choiceHistory);
         dislike.style.animationPlayState = 'running';
         dislike.classList.toggle('trigger');
       }
     });
     swiper.append(card.element);
-    CardsArr[cardCount] = card;
     cardCount++;
-    if (cardCount >= 5) {
-      cardCount = 0;
-    }
 
     const cards = swiper.querySelectorAll('.card:not(.dismissing)');
     cards.forEach((cardel, index) => {
@@ -68,17 +64,23 @@ onMounted(() => {
     });
   }
 
-  for (let i = 0; i < 5; i++) {
-    appendNewCard();
-  }
+  await axios.get(DefaultApi + "Cards", {params: {PageNumber: 1, PageSize: 1000}})
+    .then(response => {
+      cardsData.value = response.data.items;
+      console.log(cardsData.value);
+      for (let i = 0; i < cardsData.value.length; i++) {
+        appendNewCard();
+      }
+    }, error => {
+      console.log(error);
+    });
+
 });
 
 const onDislike = () => {
-  CardsArr[cardCount].swipe(-1);
 }
 
 const onLike = () => {
-  CardsArr[cardCount].swipe(1);
 }
 
 </script>

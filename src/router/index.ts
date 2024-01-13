@@ -5,7 +5,7 @@ const routes = [
   {
     path: '/',
     name: 'Swipes',
-    component: () => import('@/components/HelloWorld.vue')
+    component: () => import('@/components/MainView.vue')
   },
   {
     path: '/registration',
@@ -25,7 +25,7 @@ const routes = [
   {
     path: '/matches',
     name: 'matches',
-    component: () => import('@/components/matches.vue'),
+    component: () => import('@/components/Matches.vue'),
   },
   {
     path: '/chat',
