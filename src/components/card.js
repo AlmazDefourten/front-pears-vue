@@ -5,6 +5,7 @@ export default class Card {
   #offsetY;
 
   constructor({
+                id,
                 imageUrl,
                 onDismiss,
                 onLike,
@@ -12,6 +13,7 @@ export default class Card {
                 nickname,
                 description,
               }) {
+    this.id = id;
     this.nickname = nickname;
     this.description = description;
     this.imageUrl = imageUrl;
@@ -62,7 +64,7 @@ export default class Card {
       const {clientX, clientY} = touch;
       this.#startPoint = {x: clientX, y: clientY}
       document.addEventListener('touchmove', this.#handleTouchMove);
-      this.element.style.transition = 'transform 0s';
+      this.element.style.trans  ition = 'transform 0s';
     });
 
     document.addEventListener('touchend', this.#handleTouchEnd);
@@ -92,12 +94,12 @@ export default class Card {
     this.element.style.transform = `translate(${this.#offsetX}px, ${this.#offsetY}px) rotate(${rotate}deg)`;
     // dismiss card
     if (Math.abs(this.#offsetX) > this.element.clientWidth * 0.7) {
-      this.#dismiss(this.#offsetX > 0 ? 1 : -1);
+      this.dismiss(this.#offsetX > 0 ? 1 : -1);
     }
   }
 
   swipe = (direction) => {
-    this.#dismiss(direction);
+    this.dismiss(direction);
   }
 
   // mouse event handlers
@@ -129,7 +131,7 @@ export default class Card {
     this.element.style.transform = '';
   }
 
-  #dismiss = (direction) => {
+  dismiss = (direction) => {
     this.#startPoint = null;
     document.removeEventListener('mouseup', this.#handleMoveUp);
     document.removeEventListener('mousemove', this.#handleMouseMove);
@@ -145,7 +147,7 @@ export default class Card {
       this.onDismiss();
     }
     if (typeof this.onLike === 'function' && direction === 1) {
-      this.onLike();
+      this.onLike(this.id);
     }
     if (typeof this.onDislike === 'function' && direction === -1) {
       this.onDislike();

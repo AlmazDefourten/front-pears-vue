@@ -7,10 +7,10 @@
   >
     <v-btn
       id="dislike"
-      :onclick="onDislike"
       class="yes-no-button"
       icon="mdi-close-thick"
-      size="x-large">
+      size="x-large"
+      @click="onDislike">
     </v-btn>
     <v-btn
       id="like"
@@ -31,34 +31,37 @@ import {TestData} from "@/assets/data/TestData";
 import axios from "axios";
 import {DefaultApi} from "@/env";
 
-let CardsArr = [];
 let cardCount = 0;
+const cardsData = ref();
+const like = ref();
+const dislike = ref();
+const swiper = ref();
+const cardsClasses = ref([]);
 
 onMounted(async () => {
-  const swiper = document.querySelector('#swiper');
-  const like = document.querySelector('#like');
-  const dislike = document.querySelector('#dislike');
-
-  const cardsData = ref();
+  swiper.value = document.querySelector('#swiper');
+  like.value = document.querySelector('#like');
+  dislike.value = document.querySelector('#dislike');
 
   function appendNewCard() {
     const card = new Card({
-      imageUrl: TestData.urls[cardCount],
-      nickname: cardsData.value[cardCount].id,
+      id: cardsData.value[cardCount].id,
+      imageUrl: "data:image/png;base64," + cardsData.value[cardCount].file,
+      nickname: cardsData.value[cardCount].realName,
       description: cardsData.value[cardCount].description,
-      onLike: () => {
-        like.style.animationPlayState = 'running';
-        like.classList.toggle('trigger');
+      onDismiss: appendNewCard,
+      onLike: (id) => {
+        onLike(id);
       },
       onDislike: () => {
-        dislike.style.animationPlayState = 'running';
-        dislike.classList.toggle('trigger');
+        onDislike();
       }
     });
-    swiper.append(card.element);
-    cardCount++;
+    swiper.value.append(card.element);
+    cardsClasses.value.push(card);
+    changeCardCount();
 
-    const cards = swiper.querySelectorAll('.card:not(.dismissing)');
+    const cards = swiper.value.querySelectorAll('.card:not(.dismissing)');
     cards.forEach((cardel, index) => {
       cardel.style.setProperty('--i', index);
     });
@@ -66,7 +69,7 @@ onMounted(async () => {
 
   await axios.get(DefaultApi + "Cards", {params: {PageNumber: 1, PageSize: 1000}})
     .then(response => {
-      cardsData.value = response.data.items;
+      cardsData.value = response.data;
       console.log(cardsData.value);
       for (let i = 0; i < cardsData.value.length; i++) {
         appendNewCard();
@@ -77,10 +80,32 @@ onMounted(async () => {
 
 });
 
-const onDislike = () => {
+const changeCardCount = () => {
+  cardCount++;
+  console.log(cardsData.value.length);
+  if (cardCount >= cardsData.value.length) {
+    cardCount = 0;
+  }
 }
 
-const onLike = () => {
+let dismissed = 0;
+
+const onDislike = () => {
+  dislike.value.style.animationPlayState = 'running';
+  dislike.value.classList.toggle('trigger');
+  cardsClasses.value[dismissed++].dismiss(0);
+}
+
+const onLike = (id) => {
+  like.value.style.animationPlayState = 'running';
+  like.value.classList.toggle('trigger');
+  cardsClasses.value[dismissed++].dismiss(0);
+
+  axios.post(DefaultApi + "Matches", {matchedUserId: id})
+    .then(response => {
+    }, error => {
+      console.log(error);
+    });
 }
 
 </script>

@@ -1,116 +1,52 @@
 <script lang="ts" setup>
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
+import axios from "axios";
+import {DefaultApi} from "@/env";
 
-const activeChat = 1;
-const parents = [
-  {
-    id: 1,
-    title: "john doe",
-    active: true
-  },
-  {
-    id: 3,
-    title: "scarlett",
-    active: false
-  },
-  {
-    id: 4,
-    title: "scarlett",
-    active: false
-  },
-  {
-    id: 5,
-    title: "scarlett",
-    active: false
-  },
-  {
-    id: 6,
-    title: "scarlett",
-    active: false
-  },
-  {
-    id: 7,
-    title: "scarlett",
-    active: false
-  },
-  {
-    id: 8,
-    title: "scarlett",
-    active: false
-  },
-  {
-    id: 9,
-    title: "scarlett",
-    active: false
-  },
-  {
-    id: 10,
-    title: "scarlett",
-    active: false
-  },
-  {
-    id: 11,
-    title: "scarlett",
-    active: false
-  },
-  {
-    id: 12,
-    title: "scarlett",
-    active: false
-  },
-  {
-    id: 13,
-    title: "scarlett",
-    active: false
-  },
-  {
-    id: 14,
-    title: "scarlett",
-    active: false
-  }
-];
-const messages = ref([
-  {
-    content: "lorem ipsum",
-    me: true,
-    created_at: "11:11am"
-  },
-  {
-    content: "dolor",
-    me: false,
-    created_at: "11:11am"
-  },
-  {
-    content: "dolor",
-    me: false,
-    created_at: "11:11am"
-  },
-  {
-    content: "dolor",
-    me: false,
-    created_at: "11:11am"
-  },
-  {
-    content: "dolor",
-    me: true,
-    created_at: "11:11am"
-  },
-  {
-    content: "dolor",
-    me: false,
-    created_at: "11:12am"
-  },
-  {
-    content: "dolor",
-    me: false,
-    created_at: "11:14am"
-  }
-]);
+const activeChat = ref();
+const parents = ref([]);
+const messages = ref([]);
 const messageForm = {
-  content: "",
+  content: ref(),
   me: true,
   created_at: "11:11am"
 };
+
+function sendMessage(message: string) {
+  const msg = messageForm.content.value;
+  messageForm.content.value = "";
+  axios.post(DefaultApi + "Messages", {message: msg, userToId: activeChat.value})
+      .then(response => {
+      }, error => {
+        console.log(error);
+      });
+  messages.value.push({
+    createTime: new Date(),
+    content: msg,
+    me: true,
+  });
+}
+
+onMounted(async () => {
+  await getMessages();
+
+  await axios.get(DefaultApi + "Messages/GetChats")
+      .then(response => {
+        parents.value = response.data;
+      }, error => {
+        console.log(error);
+      });
+});
+
+async function getMessages() {
+  await axios.get(DefaultApi + "Messages", {params: {UserId: activeChat.value}})
+      .then(response => {
+        messages.value = response.data;
+      }, error => {
+        console.log(error);
+      });
+}
+
 </script>
 <template>
   <div id="app">
@@ -128,10 +64,11 @@ const messageForm = {
               height="500"
           >
             <v-list subheader>
-              <v-list-item-group v-for="(item, index) in parents" v-model="activeChat">
+              <v-list-item-group v-for="(item, index) in parents">
                 <v-list-item
                     :key="`parent${index}`"
                     :value="item.id"
+                    @click="() => {activeChat = item.id; getMessages();}"
                 >
                   <v-list-item-avatar color="grey lighten-1 white--text">
                     <v-icon>
@@ -169,9 +106,6 @@ const messageForm = {
                 class="d-flex flex-column fill-height"
                 flat
             >
-              <v-card-title>
-                john doe
-              </v-card-title>
               <v-card-text class="flex-grow-1 overflow-y-auto">
                 <template v-for="(msg, i) in messages">
                   <div
@@ -193,7 +127,7 @@ const messageForm = {
                             <sub
                                 class="ml-2"
                                 style="font-size: 0.5rem;"
-                            >{{ msg.created_at }}</sub>
+                            >{{ msg.createTime }}</sub>
                             <v-icon
                                 v-if="hover"
                                 small
@@ -214,15 +148,15 @@ const messageForm = {
               </v-card-text>
               <v-card-text class="flex-shrink-1">
                 <v-text-field
-                    v-model="messageForm.content"
+                    v-model="messageForm.content.value"
                     append-outer-icon="send"
                     hide-details
-                    label="type_a_message"
+                    label="Напишите сообщение"
                     no-details
                     outlined
                     type="text"
-                    @keyup.enter="messages.push(messageForm)"
-                    @click:append-outer="messages.push(messageForm)"
+                    @keyup.enter="sendMessage(messageForm.content.value)"
+                    @click:append-outer="sendMessage(messageForm.content.value)"
                 />
               </v-card-text>
             </v-card>

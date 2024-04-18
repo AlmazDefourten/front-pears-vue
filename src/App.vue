@@ -17,6 +17,18 @@ axios.interceptors.request.use(function (config) {
   return config;
 });
 
+axios.interceptors.response.use((response) => {
+  return response;
+}, (error) => { // Anything except 2XX goes to here
+  console.log(error);
+  if (error.message == "Network Error") {
+    window.location = window.location.protocol + "//" + window.location.host + "/login"
+  } else {
+    return Promise.reject(error); // Delegate error to calling side
+  }
+});
+
+
 </script>
 
 <style scoped>

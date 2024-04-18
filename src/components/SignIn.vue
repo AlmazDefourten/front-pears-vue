@@ -30,6 +30,7 @@ const login = () => {
     .then(response => {
       console.log(response.data);
       localStorage.setItem("accessToken", response.data.accessToken);
+      window.location = window.location.protocol + "//" + window.location.host;
     }, error => {
       console.log(error);
     });
