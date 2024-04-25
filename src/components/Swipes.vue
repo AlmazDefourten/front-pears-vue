@@ -14,7 +14,7 @@
     </v-btn>
     <v-btn
       id="like"
-      :onClick="onLike"
+      :onClick="() => onLike()"
       class="ml-15 yes-no-button"
       icon="mdi-check-bold"
       size="x-large">
@@ -50,8 +50,8 @@ onMounted(async () => {
       nickname: cardsData.value[cardCount].realName,
       description: cardsData.value[cardCount].description,
       onDismiss: appendNewCard,
-      onLike: (id) => {
-        onLike(id);
+      onLike: () => {
+        onLike();
       },
       onDislike: () => {
         onDislike();
@@ -96,12 +96,22 @@ const onDislike = () => {
   cardsClasses.value[dismissed++].dismiss(0);
 }
 
-const onLike = (id) => {
+const onLike = () => {
   like.value.style.animationPlayState = 'running';
   like.value.classList.toggle('trigger');
   cardsClasses.value[dismissed++].dismiss(0);
 
-  axios.post(DefaultApi + "Matches", {matchedUserId: id})
+  const classes = swiper.value.firstElementChild.classList;
+  let cardId;
+  classes.forEach(className => {
+    if (className.includes('cardId:')) {
+      cardId = className.split('cardId:')[1];
+    }
+  });
+
+  console.log(cardId);
+
+  axios.post(DefaultApi + "Matches", {matchedUserId: cardId})
     .then(response => {
     }, error => {
       console.log(error);

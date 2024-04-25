@@ -10,6 +10,7 @@
   "dependencies": {
     "@ionic/vue": "^7.6.0",
     "@mdi/font": "7.0.96",
+    "@microsoft/signalr": "^8.0.0",
     "axios": "^1.6.5",
     "hammerjs": "^2.0.8",
     "pinia": "^2.0.23",

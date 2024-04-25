@@ -32,6 +32,7 @@ export default class Card {
   #init = () => {
     const card = document.createElement('div');
     card.classList.add('card');
+    card.classList.add('cardId:' + this.id);
     const img = document.createElement('img');
     img.src = this.imageUrl;
     card.append(img);
@@ -64,7 +65,7 @@ export default class Card {
       const {clientX, clientY} = touch;
       this.#startPoint = {x: clientX, y: clientY}
       document.addEventListener('touchmove', this.#handleTouchMove);
-      this.element.style.trans  ition = 'transform 0s';
+      this.element.style.transition = 'transform 0s';
     });
 
     document.addEventListener('touchend', this.#handleTouchEnd);
@@ -147,7 +148,7 @@ export default class Card {
       this.onDismiss();
     }
     if (typeof this.onLike === 'function' && direction === 1) {
-      this.onLike(this.id);
+      this.onLike();
     }
     if (typeof this.onDislike === 'function' && direction === -1) {
       this.onDislike();
