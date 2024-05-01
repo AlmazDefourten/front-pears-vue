@@ -11,21 +11,16 @@ const base64 = "data:image/png;base64,";
 
 onMounted(async () => {
   const response = await axios.get(DefaultApi + "Matches", {params: {PageNumber: 1, PageSize: 1000}})
-      .then(response => {
-        cardsData.value = response.data;
-        updateKey.value++;
-      }, error => {
-        console.log(error);
-      });
+    .then(response => {
+      cardsData.value = response.data;
+      updateKey.value++;
+    }, error => {
+      console.log(error);
+    });
 })
 
 function startMessage(id: string) {
-  axios.post(DefaultApi + "Messages", {message: "Данный пользователь свайпнул вас! Начните общение сейчас!", userToId: id})
-      .then(response => {
-        window.location = window.location.protocol + "//" + window.location.host + "/chat";
-      }, error => {
-        console.log(error);
-      });
+  window.location = window.location.protocol + "//" + window.location.host + "/chat";
 }
 
 </script>
@@ -35,9 +30,9 @@ function startMessage(id: string) {
     <v-row no-gutters>
       <v-col v-for="(item, i) in cardsData" :key="updateKey" class="ml-5" order="last">
         <v-card
-            class="mx-auto my-8"
-            elevation="16"
-            max-width="344"
+          class="mx-auto my-8"
+          elevation="16"
+          max-width="344"
         >
           <v-card-item>
             <v-card-title>
@@ -51,9 +46,9 @@ function startMessage(id: string) {
             {{ item.description }}
           </v-card-text>
           <v-btn
-              block class="mt-2" color="" text="Написать сообщение" type="submit"
-              variant="outlined"
-              @click="startMessage(item.id)">
+            block class="mt-2" color="" text="Написать сообщение" type="submit"
+            variant="outlined"
+            @click="startMessage(item.id)">
           </v-btn>
         </v-card>
       </v-col>

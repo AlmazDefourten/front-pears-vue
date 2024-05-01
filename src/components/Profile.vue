@@ -12,6 +12,7 @@ const profilePictureUpdate = ref();
 
 function save() {
   const fd = new FormData();
+  console.log(profilePictureUpdate.value[0]);
   if (profilePictureUpdate.value != null) {
     fd.append("file", profilePictureUpdate.value[0]);
   }

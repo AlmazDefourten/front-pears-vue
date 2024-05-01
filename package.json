@@ -20,6 +20,7 @@
     "vue": "^3.2.0",
     "vue-card-slide": "^1.1.1",
     "vue-draggable": "^2.0.6",
+    "vue-picture-input": "^3.0.1",
     "vue-router": "^4.0.0",
     "vue-swipy": "^0.1.1",
     "vue3-touch-events": "^4.1.8",
