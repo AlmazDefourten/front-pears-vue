@@ -5,8 +5,8 @@
   >
     <v-list>
       <v-list-item
-        :prepend-avatar=TestData().testUser.avatarUrl
-        :title=TestData().testUser.name
+        :prepend-avatar=profilePicture
+        :title=realName
         size="x-large"
       ></v-list-item>
     </v-list>
@@ -25,16 +25,31 @@
 <script>
 
 import {TestData} from "@/assets/data/TestData";
+import axios from "axios";
+import {DefaultApi} from "@/env";
 
 export default {
   methods: {
-    TestData() {
-      return TestData
+    async updateInfo() {
+      await axios.get(DefaultApi + "Cards/GetUserInfo")
+        .then(response => {
+          this.realName = response.data.realName;
+          this.description = response.data.description;
+          this.profilePicture = "data:image/png;base64," + response.data.file;
+        }, error => {
+          console.log(error);
+        });
     }
+  },
+  async mounted() {
+    await this.updateInfo();
   },
   data() {
     return {
       drawer: null,
+      realName: null,
+      description: null,
+      profilePicture: null
     }
   },
 }
